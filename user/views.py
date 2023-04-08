@@ -9,7 +9,7 @@ from rest_framework import serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ('first_name', 'last_name', 'email', 'password', 'country')
+        fields = ('first_name', 'last_name', 'email', 'password')
 
     def create(self, validated_data):
         password = validated_data.pop('password', None)
