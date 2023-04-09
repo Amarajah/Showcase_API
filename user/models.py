@@ -75,13 +75,13 @@ class Tickets(models.Model):
     no_of_stock = models.IntegerField()
     purchase_limit = models.IntegerField()
     price = models.IntegerField()
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    event = models.ForeignKey(Events, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now_add = True)
 
 class TicketTransactions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(Tickets, on_delete=models.CASCADE)
     fee = models.IntegerField()
     status_choices = ( ('Successful', 'Successful'),
         ('Pending', 'Pending'),
