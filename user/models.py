@@ -29,7 +29,7 @@ class UserManager(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['email', 'password']
 
-    objects = UserManager()
+    objects = BaseUserManager()
 
     def __str__(self):
         return self.email
@@ -43,7 +43,7 @@ class UserManager(AbstractBaseUser, PermissionsMixin):
 
 class PaymentDetails(models.Model):
     token = models.CharField(max_length=70, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(self, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now_add = True)
 
@@ -63,7 +63,7 @@ class Events(models.Model):
     twitter_url = models.URLField()
     facebook_url = models.URLField()
     instagram_url = models.URLField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey('self', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now_add = True)
 
@@ -75,13 +75,13 @@ class Tickets(models.Model):
     no_of_stock = models.IntegerField()
     purchase_limit = models.IntegerField()
     price = models.IntegerField()
-    event = models.ForeignKey(Events, on_delete=models.CASCADE)
+    event = models.ForeignKey('self', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now_add = True)
 
 class TicketTransactions(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    ticket = models.ForeignKey(Tickets, on_delete=models.CASCADE)
+    user = models.ForeignKey('self', on_delete=models.CASCADE)
+    ticket = models.ForeignKey('self', on_delete=models.CASCADE)
     fee = models.IntegerField()
     status_choices = ( ('Successful', 'Successful'),
         ('Pending', 'Pending'),
