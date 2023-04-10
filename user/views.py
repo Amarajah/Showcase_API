@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.http import JsonResponse
-from rest_framework.generics import RetrieveAPIView, ListAPIView
+from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.db.models.query import QuerySet
+from rest_framework.generics import RetrieveAPIView, ListAPIView, GenericAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .serializer import UserSerializer, PaymentDetailsSerializer, EventsSerializer, TicketsSerializer, TicketTransactionsSerializer
+from .serializers import UserSerializer, PaymentDetailsSerializer, EventsSerializer, TicketsSerializer, TicketTransactionsSerializer
 from .models import User, PaymentDetails, Events, Tickets, TicketTransactions
 
 
@@ -20,25 +21,39 @@ class UserAPIView(RetrieveAPIView):
         return response.Response(serializer.data)
 
     
-def payment_details(request):
-    payments = PaymentDetails.objects.all()
+class PaymentDetailsView(GenericAPIView):
+    queryset = PaymentDetails.objects.all()
     serializer = PaymentDetailsSerializer(PaymentDetails, many=True)
-    return JsonResponse(serializer.data)
+    
+    def list(self,request):
+          queryset  = self.PaymentDetails.objects.all() 
+          serializer = PaymentDetailsSerializer(self.get_queryset(), many=True)
+          return response.Response(serializer.data)
 
-
-def events(request):
-    events = Events.objects.all()
+class EventsView(GenericAPIView):
+    queryset = Events.objects.all()
     serializer = EventsSerializer(Events, many=True)
-    return JsonResponse(serializer.data)
+    
+    def list(self,request):
+          queryset  = self.Events.objects.all() 
+          serializer = EventsSerializer(self.get_queryset(), many=True)
+          return response.Response(serializer.data)
 
-
-def ticketing(request):
-    tickets = Tickets.objects.all()
+class TicketView(GenericAPIView):
+    queryset = Tickets.objects.all()
     serializer = TicketsSerializer(Tickets, many=True)
-    return JsonResponse(serializer.data)
+
+    def list(self,request):
+          queryset  = self.Tickets.objects.all() 
+          serializer = TicketsSerializer(self.get_queryset(), many=True)
+          return response.Response(serializer.data)
 
 
-class ticket_transactions(request):
-    transactions = TicketTransactions.objects.all()
-    serializer = TicketTransactionsSerializer(TicketTransactions, many=True)
-    return JsonResponse(serializer.data)
+class TicketTransactionsView(GenericAPIView):
+    queryset = TicketTransactions.objects.all()
+    serializer = TicketTransactionsSerializer
+
+    def list(self,request):
+          queryset  = self.TicketTransactions.objects.all() 
+          serializer = TicketTransactionsSerializer(self.get_queryset(), many=True)
+          return response.Response(serializer.data)

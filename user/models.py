@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import BaseUserManager, PermissionsMixin
 from django.db import models
 
 class User(BaseUserManager):
@@ -16,7 +16,7 @@ class User(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
-class UserManager(AbstractBaseUser, PermissionsMixin):
+class UserManager(PermissionsMixin, models.Model):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
@@ -43,7 +43,7 @@ class UserManager(AbstractBaseUser, PermissionsMixin):
 
 class PaymentDetails(models.Model):
     token = models.CharField(max_length=70, blank=True)
-    user = models.ForeignKey(self, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserManager, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now_add = True)
 
@@ -63,7 +63,7 @@ class Events(models.Model):
     twitter_url = models.URLField()
     facebook_url = models.URLField()
     instagram_url = models.URLField()
-    user = models.ForeignKey('self', on_delete=models.CASCADE)
+    user = models.ForeignKey(UserManager, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now_add = True)
 
@@ -75,13 +75,13 @@ class Tickets(models.Model):
     no_of_stock = models.IntegerField()
     purchase_limit = models.IntegerField()
     price = models.IntegerField()
-    event = models.ForeignKey('self', on_delete=models.CASCADE)
+    event = models.ForeignKey(UserManager, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now_add = True)
 
 class TicketTransactions(models.Model):
-    user = models.ForeignKey('self', on_delete=models.CASCADE)
-    ticket = models.ForeignKey('self', on_delete=models.CASCADE)
+    user = models.ForeignKey(UserManager, on_delete=models.CASCADE)
+    ticket = models.ForeignKey(UserManager, on_delete=models.CASCADE)
     fee = models.IntegerField()
     status_choices = ( ('Successful', 'Successful'),
         ('Pending', 'Pending'),
@@ -90,7 +90,7 @@ class TicketTransactions(models.Model):
     status = models.CharField(max_length=20, choices=status_choices, default="status")
     no_of_purchase = models.IntegerField()
     amount = models.IntegerField()
-    ticket_id = models.IntegerField()
+    transaction_ticket_id = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add = True)
     updated_at = models.DateTimeField(auto_now_add = True)
 

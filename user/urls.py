@@ -16,7 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from user import views
+from .views import (
+    UserAPIView,
+    PaymentDetailsView,
+    EventsView,
+    TicketView,
+    TicketTransactionsView,
+)
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -27,5 +33,8 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/user/', UserAPIView.as_view(), name='user'),
-    path('payment/', views.payment_details),
+    path('payment/', PaymentDetailsView.as_view(), name='payment_details'),
+    path('events/', EventsView.as_view(), name='events'),
+    path('tickets/', TicketView.as_view(), name='tickets'),
+    path('ticket-transactions/', TicketTransactionsView.as_view(), name='ticket_transactions'),
 ]
