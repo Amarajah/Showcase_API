@@ -1,11 +1,11 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.db.models.query import QuerySet
-from rest_framework.generics import RetrieveAPIView, ListAPIView, GenericAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, GenericAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer, PaymentDetailsSerializer, EventsSerializer, TicketsSerializer, TicketTransactionsSerializer
-from .models import User, PaymentDetails, Events, Tickets, TicketTransactions
+from .models import User, PaymentDetails, Events, Tickets, TicketTransactions, UserManager
 
 
 class UserAPIView(RetrieveAPIView):
@@ -21,39 +21,72 @@ class UserAPIView(RetrieveAPIView):
         return response.Response(serializer.data)
 
     
-class PaymentDetailsView(GenericAPIView):
+class PaymentDetailsView(ListCreateAPIView):
     queryset = PaymentDetails.objects.all()
-    serializer = PaymentDetailsSerializer(PaymentDetails, many=True)
-    
-    def list(self,request):
-          queryset  = self.PaymentDetails.objects.all() 
-          serializer = PaymentDetailsSerializer(self.get_queryset(), many=True)
-          return response.Response(serializer.data)
+    serializer = PaymentDetailsSerializer
 
-class EventsView(GenericAPIView):
+    def post(self, request, *args, **kwargs):
+        serializer = PaymentDetailsSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        data = serializer.data
+        data['user'] = UserManager.objects.get(id=data['user'])
+        print(data)
+        
+        payment = PaymentDetails(**data)
+        payment.save()
+
+        return Response(data)
+
+   
+class EventsView(ListCreateAPIView):
     queryset = Events.objects.all()
-    serializer = EventsSerializer(Events, many=True)
-    
-    def list(self,request):
-          queryset  = self.Events.objects.all() 
-          serializer = EventsSerializer(self.get_queryset(), many=True)
-          return response.Response(serializer.data)
+    serializer_class = EventsSerializer
 
-class TicketView(GenericAPIView):
+    def post(self, request, *args, **kwargs):
+        serializer = EventsSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        data = serializer.data
+        data['user'] = UserManager.objects.get(id=data['user'])
+        print(data)
+        
+        event = Events(**data)
+        event.save()
+
+        return Response(data)
+
+class TicketView(ListCreateAPIView):
     queryset = Tickets.objects.all()
     serializer = TicketsSerializer(Tickets, many=True)
 
-    def list(self,request):
-          queryset  = self.Tickets.objects.all() 
-          serializer = TicketsSerializer(self.get_queryset(), many=True)
-          return response.Response(serializer.data)
+    def post(self, request, *args, **kwargs):
+        serializer = TicketsSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        data = serializer.data
+        data['user'] = UserManager.objects.get(id=data['user'])
+        print(data)
+        
+        tickett = Tickets(**data)
+        ticket.save()
+
+        return Response(data)
 
 
-class TicketTransactionsView(GenericAPIView):
+class TicketTransactionsView(ListCreateAPIView):
     queryset = TicketTransactions.objects.all()
     serializer = TicketTransactionsSerializer
 
-    def list(self,request):
-          queryset  = self.TicketTransactions.objects.all() 
-          serializer = TicketTransactionsSerializer(self.get_queryset(), many=True)
-          return response.Response(serializer.data)
+    def post(self, request, *args, **kwargs):
+        serializer = TicketTransactionsSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        data = serializer.data
+        data['user'] = UserManager.objects.get(id=data['user'])
+        print(data)
+        
+        ticket_transact = TicketTransactions(**data)
+        ticket_transact.save()
+
+        return Response(data)

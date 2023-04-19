@@ -1,22 +1,26 @@
-from django.contrib.auth.models import BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import BaseUserManager, PermissionsMixin, AbstractBaseUser
 from django.db import models
 
-class User(BaseUserManager):
+class CustomUser(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
+
+        if not password:
+            raise ValueError('Users must have a password')
+
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, email, password=None, *args, **kwargs):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, password, **extra_fields)
+        return self.create_user(email, password, **kwargs)
 
-class UserManager(PermissionsMixin, models.Model):
+class UserManager(AbstractBaseUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
@@ -27,9 +31,9 @@ class UserManager(PermissionsMixin, models.Model):
     
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['email', 'password']
+    REQUIRED_FIELDS = []
 
-    objects = BaseUserManager()
+    objects = CustomUser()
 
     def __str__(self):
         return self.email
@@ -39,6 +43,8 @@ class UserManager(PermissionsMixin, models.Model):
 
     def get_short_name(self):
         return self.first_name
+
+User = UserManager
 
 
 class PaymentDetails(models.Model):
@@ -56,9 +62,9 @@ class Events(models.Model):
     category = models.CharField(max_length=50, blank=True)
     custom_url = models.URLField()
     frequency = models.IntegerField()
-    start_date = models.DateField()
+    start_date = models.DateTimeField()
     start_time = models.TimeField()
-    end_date = models.DateField()
+    end_date = models.DateTimeField()
     end_time = models.TimeField()
     twitter_url = models.URLField()
     facebook_url = models.URLField()
